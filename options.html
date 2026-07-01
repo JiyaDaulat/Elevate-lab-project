@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>TrackShield Settings</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', system-ui, sans-serif; background: #0d1117; color: #e6edf3; max-width: 600px; margin: 0 auto; padding: 32px 24px; }
+    h1 { font-size: 22px; font-weight: 800; margin-bottom: 4px; }
+    .subtitle { color: #8b949e; font-size: 13px; margin-bottom: 32px; }
+    .card { background: #161b22; border: 1px solid #21262d; border-radius: 10px; padding: 20px; margin-bottom: 20px; }
+    .card h2 { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+    .card p  { font-size: 12px; color: #8b949e; margin-bottom: 14px; }
+    .input-row { display: flex; gap: 8px; }
+    input[type="text"] { flex: 1; background: #0d1117; border: 1px solid #21262d; border-radius: 6px; color: #e6edf3; padding: 8px 12px; font-size: 13px; outline: none; }
+    input[type="text"]:focus { border-color: #388bfd; }
+    .add-btn { padding: 8px 16px; background: #238636; border: none; border-radius: 6px; color: #fff; font-size: 13px; font-weight: 600; cursor: pointer; }
+    .add-btn:hover { background: #2ea043; }
+    .tag-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; min-height: 32px; }
+    .tag { display: flex; align-items: center; gap: 6px; padding: 4px 10px; background: #21262d; border-radius: 20px; font-size: 12px; }
+    .tag .remove { cursor: pointer; color: #f85149; font-weight: 700; font-size: 14px; line-height: 1; }
+    .tag .remove:hover { color: #ff6b6b; }
+    .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .stat-box { background: #0d1117; border: 1px solid #21262d; border-radius: 8px; padding: 14px; text-align: center; }
+    .stat-num { font-size: 28px; font-weight: 800; color: #f85149; }
+    .stat-label { font-size: 11px; color: #8b949e; margin-top: 2px; }
+    .danger-btn { padding: 8px 16px; background: transparent; border: 1px solid #f85149; border-radius: 6px; color: #f85149; font-size: 12px; font-weight: 600; cursor: pointer; }
+    .danger-btn:hover { background: #f8514915; }
+    .toast { position: fixed; top: 20px; right: 20px; background: #238636; color: #fff; font-size: 12px; font-weight: 600; padding: 8px 16px; border-radius: 8px; opacity: 0; transition: opacity .3s; pointer-events: none; }
+    .toast.show { opacity: 1; }
+  </style>
+</head>
+<body>
+  <h1>🛡 TrackShield Settings</h1>
+  <p class="subtitle">Manage your whitelist, blacklist, and view blocking statistics.</p>
+
+  <!-- Whitelist -->
+  <div class="card">
+    <h2>✓ Whitelist (Always Allow)</h2>
+    <p>Domains where TrackShield will not block any requests.</p>
+    <div class="input-row">
+      <input type="text" id="wlInput" placeholder="example.com" />
+      <button class="add-btn" id="addWl">Add</button>
+    </div>
+    <div class="tag-list" id="wlList"></div>
+  </div>
+
+  <!-- Blacklist -->
+  <div class="card">
+    <h2>✗ Custom Block List</h2>
+    <p>Extra domains to block beyond the built-in tracker list.</p>
+    <div class="input-row">
+      <input type="text" id="blInput" placeholder="tracker.example.com" />
+      <button class="add-btn" id="addBl">Add</button>
+    </div>
+    <div class="tag-list" id="blList"></div>
+  </div>
+
+  <!-- Stats -->
+  <div class="card">
+    <h2>Analytics</h2>
+    <p>Your personal blocking statistics.</p>
+    <div class="stats-grid">
+      <div class="stat-box"><div class="stat-num" id="statTotal">0</div><div class="stat-label">Total Blocked</div></div>
+      <div class="stat-box"><div class="stat-num" id="statWl">0</div><div class="stat-label">Whitelisted Sites</div></div>
+      <div class="stat-box"><div class="stat-num" id="statBl">0</div><div class="stat-label">Custom Blocked</div></div>
+      <div class="stat-box"><div class="stat-num">40</div><div class="stat-label">Built-in Rules</div></div>
+    </div>
+    <div style="margin-top:14px">
+      <button class="danger-btn" id="resetStats">Reset Statistics</button>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+  <script src="options.js"></script>
+</body>
+</html>

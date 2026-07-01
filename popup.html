@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>TrackShield</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { width: 340px; font-family: 'Segoe UI', system-ui, sans-serif; background: #0d1117; color: #e6edf3; }
+    .header { background: linear-gradient(135deg, #1a1f2e 0%, #0d1117 100%); border-bottom: 1px solid #21262d; padding: 16px 18px 14px; display: flex; align-items: center; gap: 10px; }
+    .shield { width: 36px; height: 36px; background: linear-gradient(135deg, #238636, #2ea043); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+    .header-text h1 { font-size: 15px; font-weight: 700; letter-spacing: .3px; }
+    .header-text p  { font-size: 11px; color: #8b949e; margin-top: 2px; }
+    .status-pill { margin: 14px 18px 0; display: flex; align-items: center; gap: 8px; background: #161b22; border: 1px solid #21262d; border-radius: 20px; padding: 8px 14px; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .dot.active { background: #3fb950; box-shadow: 0 0 6px #3fb95066; }
+    .dot.paused { background: #d29922; }
+    .status-label { font-size: 12px; font-weight: 600; flex: 1; }
+    .toggle-btn { font-size: 10px; font-weight: 600; letter-spacing: .4px; padding: 3px 10px; border-radius: 12px; border: 1px solid; cursor: pointer; transition: all .2s; background: transparent; }
+    .toggle-btn.on  { color: #f85149; border-color: #f85149; }
+    .toggle-btn.on:hover  { background: #f8514920; }
+    .toggle-btn.off { color: #3fb950; border-color: #3fb950; }
+    .toggle-btn.off:hover { background: #3fb95020; }
+    .counter-section { margin: 14px 18px 0; background: #161b22; border: 1px solid #21262d; border-radius: 10px; padding: 16px; text-align: center; }
+    .counter-num { font-size: 48px; font-weight: 800; background: linear-gradient(135deg, #f85149, #ff6b6b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; line-height: 1; }
+    .counter-label { font-size: 11px; color: #8b949e; margin-top: 4px; }
+    .counter-sub   { font-size: 10px; color: #484f58; margin-top: 6px; }
+    .counter-total { color: #8b949e; font-weight: 600; }
+    .section-title { font-size: 10px; font-weight: 700; letter-spacing: .8px; text-transform: uppercase; color: #484f58; margin: 14px 18px 6px; }
+    .blocked-list { margin: 0 18px; max-height: 120px; overflow-y: auto; scrollbar-width: thin; scrollbar-color: #21262d transparent; }
+    .tracker-item { display: flex; align-items: center; gap: 8px; padding: 6px 10px; background: #161b22; border: 1px solid #21262d; border-radius: 6px; margin-bottom: 4px; font-size: 11px; }
+    .tracker-name { flex: 1; color: #cdd9e5; }
+    .blocked-badge { font-size: 9px; font-weight: 700; color: #f85149; background: #f8514915; border: 1px solid #f8514930; padding: 1px 6px; border-radius: 8px; }
+    .empty-msg { text-align: center; font-size: 11px; color: #484f58; padding: 12px; background: #161b22; border: 1px dashed #21262d; border-radius: 6px; }
+    .actions { display: flex; gap: 8px; margin: 14px 18px; }
+    .action-btn { flex: 1; padding: 8px; background: #161b22; border: 1px solid #21262d; border-radius: 8px; color: #8b949e; font-size: 11px; font-weight: 600; cursor: pointer; transition: all .2s; display: flex; align-items: center; justify-content: center; gap: 5px; }
+    .action-btn:hover { border-color: #388bfd; color: #58a6ff; background: #1c2432; }
+    .action-btn.whitelist:hover { border-color: #3fb950; color: #3fb950; }
+    .footer { border-top: 1px solid #21262d; padding: 8px 18px; display: flex; justify-content: space-between; align-items: center; }
+    .footer-stat { font-size: 10px; color: #484f58; }
+    .footer-stat span { color: #8b949e; font-weight: 600; }
+    .settings-link { font-size: 10px; color: #388bfd; text-decoration: none; cursor: pointer; }
+    .settings-link:hover { text-decoration: underline; }
+    .toast { position: fixed; bottom: 12px; left: 50%; transform: translateX(-50%); background: #238636; color: #fff; font-size: 11px; font-weight: 600; padding: 6px 14px; border-radius: 20px; opacity: 0; transition: opacity .3s; pointer-events: none; }
+    .toast.show { opacity: 1; }
+  </style>
+</head>
+<body>
+<div class="header">
+  <div class="shield">&#x1F6E1;</div>
+  <div class="header-text">
+    <h1>TrackShield</h1>
+    <p>Privacy Protection Active</p>
+  </div>
+</div>
+<div class="status-pill">
+  <div class="dot active" id="statusDot"></div>
+  <span class="status-label" id="statusLabel">Blocking Trackers</span>
+  <button class="toggle-btn on" id="toggleBtn">PAUSE</button>
+</div>
+<div class="counter-section">
+  <div class="counter-num" id="tabCount">0</div>
+  <div class="counter-label">Trackers blocked on this page</div>
+  <div class="counter-sub">All time: <span class="counter-total" id="totalCount">0</span> blocked</div>
+</div>
+<div class="section-title">Blocked on this page</div>
+<div class="blocked-list" id="blockedList">
+  <div class="empty-msg" id="emptyMsg">No trackers detected yet</div>
+</div>
+<div class="actions">
+  <button class="action-btn whitelist" id="whitelistBtn">Whitelist Site</button>
+  <button class="action-btn" id="settingsBtn">Settings</button>
+</div>
+<div class="footer">
+  <div class="footer-stat">Rules: <span>40</span> trackers</div>
+  <a class="settings-link" id="optionsLink">Manage Lists</a>
+</div>
+<div class="toast" id="toast"></div>
+<script src="popup.js"></script>
+</body>
+</html>
